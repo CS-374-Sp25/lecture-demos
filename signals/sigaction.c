@@ -29,8 +29,9 @@ int main() {
 	sigint_sa.sa_handler = sigint_handler;
 	sigfillset(&(sigint_sa.sa_mask));
 	sigint_sa.sa_flags = SA_RESTART;
-	// DON'T DO THIS. JUST INITIALIZE THE SIGACTION STRUCTURE TO {0}, AS
-	// ABOVE.
+
+	// DON'T UNCOMMENT THE BELOW LINE. JUST INITIALIZE THE SIGACTION
+	// STRUCTURE TO {0}, AS ABOVE.
 	// sigint_sa.sa_sigaction = NULL;
 
 	sigaction(SIGINT, &sigint_sa, NULL);
