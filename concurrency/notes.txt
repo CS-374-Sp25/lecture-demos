@@ -1,0 +1,7 @@
+Thread A locks mutex 1
+
+Thread B locks mutex 2
+
+Thread A tries to lock mutex 2. It must wait until thread B releases it.
+
+Thread B tries to lock mutex 1. It must wait until thread A releases it.
