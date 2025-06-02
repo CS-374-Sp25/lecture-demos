@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -26,16 +29,42 @@ int main() {
 		printf("Failed to listen!\n");
 	}
 
-	struct sockaddr client_addr;
-	socklen_t client_addr_len;
-	int communication_socket_fd = accept(listening_socket_fd, &client_addr, &client_addr_len);
-	if (communication_socket_fd < 0) {
-		printf("Failed to accept!\n");
-	}
+	while (1) {
+		struct sockaddr client_addr;
+		socklen_t client_addr_len;
+		int communication_socket_fd = accept(listening_socket_fd, &client_addr, &client_addr_len);
+		if (communication_socket_fd < 0) {
+			printf("Failed to accept!\n");
+		}
 
-	char buffer[256] = {'\0'};
-	int n_bytes_received = recv(communication_socket_fd, buffer, 255, 0);
-	printf("The client said: %s\n", buffer);
+		pid_t fork_result = fork();
+		if (fork_result == 0) {
+			// I am the child process!
+			char buffer[256] = {'\0'};
+			int total_bytes_received = 0;
+			while (strstr(buffer, "@@") == NULL) {
+				int n_bytes_received = recv(
+					communication_socket_fd,
+					buffer + total_bytes_received,
+					255 - total_bytes_received,
+					0
+				);
+				total_bytes_received += n_bytes_received;
+			}
+			buffer[total_bytes_received - 1] = '\0';
+			buffer[total_bytes_received - 2] = '\0';
+
+			char* first_message = strtok(buffer, "$");
+			char* second_message = strtok(NULL, "$");
+			printf("The client's first message: %s\n", first_message);
+			printf("The client's second message: %s\n", second_message);
+
+			exit(0);
+		} else {
+			// I am the parent process!
+			close(communication_socket_fd);
+		}
+	}
 
 	// read, write
 	// recv(), send()

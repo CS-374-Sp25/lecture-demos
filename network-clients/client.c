@@ -61,7 +61,29 @@ int main() {
 		printf("Failed to connect!\n");
 	}
 
-	
-	char* message = "Yo server! I heard you like clients!";
-	int n_bytes_sent = send(socket_fd, message, strlen(message), 0);
+	char* message = "Yo server! I heard you like clients!$";
+	size_t total_bytes_to_send = strlen(message);
+	size_t total_bytes_sent = 0;
+	while (total_bytes_sent < total_bytes_to_send) {
+		int n_bytes_sent = send(
+			socket_fd,
+			message + total_bytes_sent,
+			total_bytes_to_send - total_bytes_sent,
+			0
+		);
+		total_bytes_sent += n_bytes_sent;
+	}
+
+	char* message2 = "Second message!!!@@";
+	total_bytes_to_send = strlen(message2);
+	total_bytes_sent = 0;
+	while (total_bytes_sent < total_bytes_to_send) {
+		int n_bytes_sent = send(
+			socket_fd,
+			message2 + total_bytes_sent,
+			total_bytes_to_send - total_bytes_sent,
+			0
+		);
+		total_bytes_sent += n_bytes_sent;
+	}
 }
